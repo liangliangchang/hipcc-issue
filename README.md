@@ -23,7 +23,8 @@ hipcc-issue/
 ├── build.sh
 ├── compare.sh
 ├── compare_hot.py
-└── vendor_from_llama.sh             # optional: refresh kernel/ from llama.cpp
+├── vendor_from_llama.sh             # optional: refresh kernel/ from llama.cpp
+└── LLVM-EXPERIMENTS.md              # LLVM bisect + fork pass investigation notes
 ```
 
 ## Three source variants
@@ -91,6 +92,8 @@ Opcode preview (`d`=LDS `W`=WMMA `F`=fma_mix `b`=barrier):
 ## Root cause
 
 First diverging LLVM pass: `postmisched`. Stripped hot MIR has prefix FMA before WMMA; split/fix cluster DS before WMMA. `SIInsertWaitcnts` then emits deep `lgkmcnt` on stripped.
+
+See **[LLVM-EXPERIMENTS.md](LLVM-EXPERIMENTS.md)** for the full bisect timeline, fork LLVM passes we tried, what worked in the MIR harness vs end-to-end, and why the source tile-barrier fix shipped instead.
 
 ## Environment
 
